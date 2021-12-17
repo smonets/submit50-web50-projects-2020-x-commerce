@@ -23,7 +23,8 @@ class Listing(models.Model):
     description = models.TextField()
     starting_bid = models.IntegerField()
     photo_url = models.URLField()
-    category = models.ManyToManyField(Category, blank=True, related_name="Listings")
+    category = models.ForeignKey(Category, on_delete=models.CASCADE)
+    owner = models.ForeignKey(User, on_delete=models.CASCADE)
 
 
     def __str__(self):
