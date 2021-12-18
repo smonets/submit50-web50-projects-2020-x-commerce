@@ -5,7 +5,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, redirect
 from django.urls import reverse
 
-from .models import User, Listing
+from .models import User, Listing, Category
 from .forms import ListingForm
 
 
@@ -87,4 +87,10 @@ def listing(request, listing_id):
     listing = Listing.objects.get(id=listing_id)
     context = {'listing': listing}
     return render(request, "auctions/listing.html", context)
+
+
+def categories(request):
+    categories = Category.objects.all()
+    context = {'categories': categories}
+    return render(request, "auctions/categories.html", context)
 
