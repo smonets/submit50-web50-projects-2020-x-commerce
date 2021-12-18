@@ -1,7 +1,8 @@
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
 from django.db import IntegrityError
 from django.http import HttpResponse, HttpResponseRedirect
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.urls import reverse
 
 from .models import User, Listing
@@ -10,7 +11,9 @@ from .forms import ListingForm
 
 
 def index(request):
-    return render(request, "auctions/index.html")
+    listings = Listing.objects.order_by('date_added')
+    context = {'listings': listings}
+    return render(request, "auctions/index.html", context)
 
 
 def login_view(request):
@@ -65,11 +68,23 @@ def register(request):
         return render(request, "auctions/register.html")
 
 
+@login_required
 def new(request):
 
     if request.method == 'POST':
-        pass
+        form = ListingForm(data=request.POST)
+        if form.is_valid():
+            new_listing = form.save(commit=False)
+            new_listing.owner = request.user
+            new_listing.save()
+            return redirect('index')
     else:
         form = ListingForm()
         context = {'form': form}
         return render(request, "auctions/new.html", context)
+
+def listing(request, listing_id):
+    listing = Listing.objects.get(id=listing_id)
+    context = {'listing': listing}
+    return render(request, "auctions/listing.html", context)
+

@@ -22,9 +22,10 @@ class Listing(models.Model):
     title = models.CharField(max_length=100)
     description = models.TextField()
     starting_bid = models.IntegerField()
-    photo_url = models.URLField()
+    photo_url = models.URLField(null=True, blank=True)
     category = models.ForeignKey(Category, on_delete=models.CASCADE)
     owner = models.ForeignKey(User, on_delete=models.CASCADE)
+    date_added = models.DateTimeField(auto_now_add=True)
 
 
     def __str__(self):
