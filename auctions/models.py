@@ -23,7 +23,7 @@ class Listing(models.Model):
     description = models.TextField()
     starting_bid = models.IntegerField()
     photo_url = models.URLField(null=True, blank=True)
-    category = models.ForeignKey(Category, on_delete=models.CASCADE)
+    category = models.ForeignKey(Category, on_delete=models.CASCADE, related_name="listings")
     owner = models.ForeignKey(User, on_delete=models.CASCADE)
     date_added = models.DateTimeField(auto_now_add=True)
 
