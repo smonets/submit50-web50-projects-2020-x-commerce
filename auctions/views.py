@@ -83,9 +83,16 @@ def new(request):
         context = {'form': form}
         return render(request, "auctions/new.html", context)
 
+
 def listing(request, listing_id):
     listing = Listing.objects.get(id=listing_id)
-    context = {'listing': listing}
+    user = request.user
+    watching = user.watch_listings.all()
+    if listing in watching:
+        show = False
+    else:
+        show = True
+    context = {'listing': listing, 'show': show}
     return render(request, "auctions/listing.html", context)
 
 
@@ -104,7 +111,8 @@ def category_items(request, category_id):
 
 def watchlist(request):
     user = request.user
-    context = {'user': user}
+    watching = user.watch_listings.all()
+    context = {'user': user, 'watchings': watching}
     return render(request, "auctions/watching.html", context)
 
 
