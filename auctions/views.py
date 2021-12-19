@@ -94,8 +94,17 @@ def categories(request):
     context = {'categories': categories}
     return render(request, "auctions/categories.html", context)
 
+
 def category_items(request, category_id):
     category = Category.objects.get(id=category_id)
     listings = category.listings.all()
     context = {'category': category, 'listings': listings}
     return render(request, "auctions/category_id.html", context)
+
+
+def watchlist(request):
+    user = request.user
+    context = {'user': user}
+    return render(request, "auctions/watching.html", context)
+
+
