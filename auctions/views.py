@@ -6,7 +6,7 @@ from django.shortcuts import render, redirect
 from django.urls import reverse
 
 from .models import User, Listing, Category, Comment
-from .forms import ListingForm
+from .forms import ListingForm, CommentForm
 
 
 
@@ -84,28 +84,52 @@ def new(request):
         return render(request, "auctions/new.html", context)
 
 
-@login_required
+
 def listing(request, listing_id):
-    if request.method != "POST":
-        listing = Listing.objects.get(id=listing_id)
-        user = request.user
-        comments = listing.comment_set.all()
-        watching = user.watch_listings.all()
-        if listing in watching:
-            show = False
+    user = request.user
+    users = User.objects.all()
+    if user in users:
+        if request.method != "POST":
+            listing = Listing.objects.get(id=listing_id)
+            comments = listing.comment_set.all()
+            watching = user.watch_listings.all()
+            if listing in watching:
+                show = False
+            else:
+                show = True
+            context = {'listing': listing, 'show': show, 'comments': comments}
+            return render(request, "auctions/listing.html", context)
         else:
-            show = True
-        context = {'listing': listing, 'show': show, 'comments': comments}
-        return render(request, "auctions/listing.html", context)
+            listing = Listing.objects.get(id=listing_id)
+            watching = user.watch_listings.all()
+            if listing in watching:
+                user.watch_listings.remove(listing)
+            else:
+                user.watch_listings.add(listing)
+            return HttpResponseRedirect(reverse("listing", args=(listing.id,)))
     else:
         listing = Listing.objects.get(id=listing_id)
-        user = request.user
-        watching = user.watch_listings.all()
-        if listing in watching:
-            user.watch_listings.remove(listing)
-        else:
-            user.watch_listings.add(listing)
-        return HttpResponseRedirect(reverse("listing", args=(listing.id,)))
+        comments = listing.comment_set.all()
+        signed = True
+        context = {'listing': listing, 'signed': signed, 'comments': comments}
+        return render(request, "auctions/listing.html", context)
+
+@login_required
+def comment(request, listing_id):
+    if request.method != "POST":
+        listing = Listing.objects.get(id=listing_id)
+        form = CommentForm()
+        context = {'listing': listing, 'form': form}
+        return render(request, "auctions/comment.html", context)
+    else:
+        listing = Listing.objects.get(id=listing_id)
+        form = CommentForm(data=request.POST)
+        if form.is_valid():
+            new_comment = form.save(commit=False)
+            new_comment.listing = listing
+            new_comment.owner = request.user
+            new_comment.save()
+            return HttpResponseRedirect(reverse("listing", args=(listing.id,)))
 
 
 @login_required
