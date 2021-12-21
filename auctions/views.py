@@ -85,15 +85,22 @@ def new(request):
 
 
 def listing(request, listing_id):
-    listing = Listing.objects.get(id=listing_id)
-    user = request.user
-    watching = user.watch_listings.all()
-    if listing in watching:
-        show = False
+    if request.method != "POST":
+        listing = Listing.objects.get(id=listing_id)
+        user = request.user
+        watching = user.watch_listings.all()
+        if listing in watching:
+            show = False
+        else:
+            show = True
+        context = {'listing': listing, 'show': show}
+        return render(request, "auctions/listing.html", context)
     else:
-        show = True
-    context = {'listing': listing, 'show': show}
-    return render(request, "auctions/listing.html", context)
+        listing = Listing.objects.get(id=listing_id)
+        user = request.user
+        user.watch_listings.add(listing)
+        return HttpResponseRedirect(reverse("listing", args=(listing.id,)))
+
 
 
 def categories(request):
@@ -110,9 +117,17 @@ def category_items(request, category_id):
 
 
 def watchlist(request):
-    user = request.user
-    watching = user.watch_listings.all()
-    context = {'user': user, 'watchings': watching}
-    return render(request, "auctions/watching.html", context)
+    if request.method != "POST":
+        user = request.user
+        watching = user.watch_listings.all()
+        context = {'user': user, 'watchings': watching}
+        return render(request, "auctions/watching.html", context)
+    else:
+        user = request.user
+        watching = user.watch_listings.all()
+
+        context = {'user': user, 'watchings': watching}
+        return render(request, "auctions/watching.html", context)
+
 
 
