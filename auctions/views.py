@@ -84,6 +84,7 @@ def new(request):
         return render(request, "auctions/new.html", context)
 
 
+@login_required
 def listing(request, listing_id):
     if request.method != "POST":
         listing = Listing.objects.get(id=listing_id)
@@ -102,13 +103,14 @@ def listing(request, listing_id):
         return HttpResponseRedirect(reverse("listing", args=(listing.id,)))
 
 
-
+@login_required
 def categories(request):
     categories = Category.objects.all()
     context = {'categories': categories}
     return render(request, "auctions/categories.html", context)
 
 
+@login_required
 def category_items(request, category_id):
     category = Category.objects.get(id=category_id)
     listings = category.listings.all()
@@ -116,6 +118,7 @@ def category_items(request, category_id):
     return render(request, "auctions/category_id.html", context)
 
 
+@login_required
 def watchlist(request):
     if request.method != "POST":
         user = request.user
