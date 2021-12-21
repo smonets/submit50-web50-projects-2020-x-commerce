@@ -124,10 +124,10 @@ def watchlist(request):
         return render(request, "auctions/watching.html", context)
     else:
         user = request.user
-        watching = user.watch_listings.all()
+        watch_id = int(request.POST["submit"])
+        user.watch_listings.remove(watch_id)
+        return HttpResponseRedirect(reverse("watchlist"))
 
-        context = {'user': user, 'watchings': watching}
-        return render(request, "auctions/watching.html", context)
 
 
 
