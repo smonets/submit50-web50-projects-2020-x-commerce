@@ -31,6 +31,19 @@ class Listing(models.Model):
     def __str__(self):
         return self.title
 
+class Comment(models.Model):
+    listing = models.ForeignKey(Listing, on_delete=models.CASCADE)
+    text = models.TextField()
+    owner = models.ForeignKey(User, on_delete=models.CASCADE)
+    date_added = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        verbose_name_plural = "Comments"
+
+    def __str__(self):
+        return f"{self.owner}:{self.text[:20]}..."
+
+
 
 
 

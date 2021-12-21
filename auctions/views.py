@@ -5,7 +5,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, redirect
 from django.urls import reverse
 
-from .models import User, Listing, Category
+from .models import User, Listing, Category, Comment
 from .forms import ListingForm
 
 
@@ -89,17 +89,22 @@ def listing(request, listing_id):
     if request.method != "POST":
         listing = Listing.objects.get(id=listing_id)
         user = request.user
+        comments = listing.comment_set.all()
         watching = user.watch_listings.all()
         if listing in watching:
             show = False
         else:
             show = True
-        context = {'listing': listing, 'show': show}
+        context = {'listing': listing, 'show': show, 'comments': comments}
         return render(request, "auctions/listing.html", context)
     else:
         listing = Listing.objects.get(id=listing_id)
         user = request.user
-        user.watch_listings.add(listing)
+        watching = user.watch_listings.all()
+        if listing in watching:
+            user.watch_listings.remove(listing)
+        else:
+            user.watch_listings.add(listing)
         return HttpResponseRedirect(reverse("listing", args=(listing.id,)))
 
 
