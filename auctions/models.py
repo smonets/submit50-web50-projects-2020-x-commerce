@@ -43,6 +43,17 @@ class Comment(models.Model):
     def __str__(self):
         return f"{self.owner}:{self.text[:20]}..."
 
+class Bid(models.Model):
+    listing = models.ForeignKey(Listing, on_delete=models.CASCADE)
+    owner = models.ForeignKey(User, on_delete=models.CASCADE)
+    bid = models.IntegerField()
+
+    class Meta:
+        verbose_name_plural = "Bids"
+
+    def __str__(self):
+        return f"{self.owner}: {self.listing} - {self.bid} $"
+
 
 
 

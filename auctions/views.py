@@ -5,7 +5,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from django.shortcuts import render, redirect
 from django.urls import reverse
 
-from .models import User, Listing, Category, Comment
+from .models import User, Listing, Category, Comment, Bid
 from .forms import ListingForm, CommentForm
 
 
@@ -88,30 +88,35 @@ def new(request):
 def listing(request, listing_id):
     user = request.user
     users = User.objects.all()
+    listing = Listing.objects.get(id=listing_id)
+    comments = listing.comment_set.all()
+    watching = user.watch_listings.all()
+    highest = listing.starting_bid
+    bids = listing.bid_set.all()
+    highest_owner = "No one yet"
+    for bid in bids:
+        if bid.bid > highest:
+            highest = bid.bid
+            highest_owner = bid.owner
     if user in users:
         if request.method != "POST":
-            listing = Listing.objects.get(id=listing_id)
-            comments = listing.comment_set.all()
-            watching = user.watch_listings.all()
             if listing in watching:
                 show = False
             else:
                 show = True
-            context = {'listing': listing, 'show': show, 'comments': comments}
+            context = {'listing': listing, 'show': show, 'comments': comments, 'highest_bid': highest,
+                       'highest_owner': highest_owner}
             return render(request, "auctions/listing.html", context)
         else:
-            listing = Listing.objects.get(id=listing_id)
-            watching = user.watch_listings.all()
             if listing in watching:
                 user.watch_listings.remove(listing)
             else:
                 user.watch_listings.add(listing)
             return HttpResponseRedirect(reverse("listing", args=(listing.id,)))
     else:
-        listing = Listing.objects.get(id=listing_id)
-        comments = listing.comment_set.all()
         signed = True
-        context = {'listing': listing, 'signed': signed, 'comments': comments}
+        context = {'listing': listing, 'signed': signed, 'comments': comments,'highest_bid': highest,
+                   'highest_owner': highest_owner}
         return render(request, "auctions/listing.html", context)
 
 @login_required
