@@ -166,5 +166,11 @@ def watchlist(request):
         return HttpResponseRedirect(reverse("watchlist"))
 
 
+@login_required
+def bid(request, listing_id):
+    listing = Listing.objects.get(id=listing_id)
+    user = request.user
+    return render(request, "auctions/bid.html")
+
 
 
