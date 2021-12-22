@@ -6,7 +6,7 @@ from django.shortcuts import render, redirect
 from django.urls import reverse
 
 from .models import User, Listing, Category, Comment, Bid
-from .forms import ListingForm, CommentForm
+from .forms import ListingForm, CommentForm, BidForm
 
 
 
@@ -170,7 +170,28 @@ def watchlist(request):
 def bid(request, listing_id):
     listing = Listing.objects.get(id=listing_id)
     user = request.user
-    return render(request, "auctions/bid.html")
+    if request.method != "POST":
+        form = BidForm()
+        context = {'form': form, 'listing': listing}
+        return render(request, "auctions/bid.html", context)
+    else:
+        form = BidForm(data=request.POST)
+        if form.is_valid():
+            new_bid = form.save(commit=False)
+            new_bid.listing = listing
+            new_bid.owner = user
+            bids = listing.bid_set.all()
+            for bid in bids:
+                if new_bid.bid < bid.bid:
+                    error = "Your bid is too small"
+                    context = {'form': form, 'listing': listing, 'error': error}
+                    return render(request, "auctions/bid.html", context)
+            else:
+                new_bid.save()
+                return HttpResponseRedirect(reverse("listing", args=(listing.id,)))
+
+
+
 
 
 
