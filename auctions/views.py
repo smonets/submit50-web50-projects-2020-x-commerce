@@ -90,7 +90,6 @@ def listing(request, listing_id):
     users = User.objects.all()
     listing = Listing.objects.get(id=listing_id)
     comments = listing.comment_set.all()
-    watching = user.watch_listings.all()
     highest = listing.starting_bid
     bids = listing.bid_set.all()
     highest_owner = "No one yet"
@@ -99,6 +98,7 @@ def listing(request, listing_id):
             highest = bid.bid
             highest_owner = bid.owner
     if user in users:
+        watching = user.watch_listings.all()
         if request.method != "POST":
             if listing in watching:
                 show = False
