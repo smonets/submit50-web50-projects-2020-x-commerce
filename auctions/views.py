@@ -12,7 +12,11 @@ from .forms import ListingForm, CommentForm, BidForm
 
 def index(request):
     listings = Listing.objects.order_by('date_added')
-    context = {'listings': listings}
+    active_listings = []
+    for listing in listings:
+        if listing.active == True:
+            active_listings.append(listing)
+    context = {'listings': active_listings}
     return render(request, "auctions/index.html", context)
 
 
@@ -92,7 +96,8 @@ def listing(request, listing_id):
     comments = listing.comment_set.all()
     highest = listing.starting_bid
     bids = listing.bid_set.all()
-    highest_owner = "No one yet"
+    highest_owner = "owner"
+    show_closing = False
     for bid in bids:
         if bid.bid > highest:
             highest = bid.bid
@@ -100,19 +105,25 @@ def listing(request, listing_id):
     if user in users:
         watching = user.watch_listings.all()
         if request.method != "POST":
+            if listing.owner == user and listing.active == True:
+                show_closing = True
             if listing in watching:
                 show = False
             else:
                 show = True
             context = {'listing': listing, 'show': show, 'comments': comments, 'highest_bid': highest,
-                       'highest_owner': highest_owner}
+                       'highest_owner': highest_owner, 'show_closing': show_closing, 'user': user}
             return render(request, "auctions/listing.html", context)
         else:
-            if listing in watching:
-                user.watch_listings.remove(listing)
-            else:
-                user.watch_listings.add(listing)
-            return HttpResponseRedirect(reverse("listing", args=(listing.id,)))
+            if 'watchlist' in request.POST:
+                if listing in watching:
+                    user.watch_listings.remove(listing)
+                else:
+                    user.watch_listings.add(listing)
+            if 'active' in request.POST:
+                listing.active = False
+                listing.save()
+        return HttpResponseRedirect(reverse("listing", args=(listing.id,)))
     else:
         signed = True
         context = {'listing': listing, 'signed': signed, 'comments': comments,'highest_bid': highest,
