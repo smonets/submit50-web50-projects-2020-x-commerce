@@ -4,16 +4,20 @@
     <h2>Active Listings</h2>
 
     {% for listing in listings %}
-        <div style="border-width:1;
+        <div style="border-width: 1;
                     border-color: black;
-                    border-style: solid;">
-
+                    border-style: solid;
+                    margin-top: 10px;">
+            <div align="center" style="margin-top:10px;
+                                       ">
             {% if listing.photo_url %}
                 <img src="{{listing.photo_url}}" alt="Listing_photo" width="150" height="150">
             {% else %}
                 <img src="https://www.freeiconspng.com/uploads/no-image-icon-23.jpg" alt="Listing_photo" width="150" height="150">
             {% endif %}
+            </div>
             <p></p>
+            <div>
             <a href="{% url 'listing' listing.id %}"><h3>{{listing.title}}</h3></a>
             <br>
             Description: {{listing.description}}
@@ -23,8 +27,7 @@
             Owner: {{listing.owner}}
             <p></p>
             Date added: {{listing.date_added}}
-
-
+            </div>
         </div>
     {% endfor %}
 

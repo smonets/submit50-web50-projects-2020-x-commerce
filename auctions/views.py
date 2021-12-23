@@ -193,7 +193,7 @@ def bid(request, listing_id):
             new_bid.owner = user
             bids = listing.bid_set.all()
             for bid in bids:
-                if new_bid.bid < bid.bid:
+                if new_bid.bid < bid.bid or new_bid.bid < listing.starting_bid:
                     error = "Your bid is too small"
                     context = {'form': form, 'listing': listing, 'error': error}
                     return render(request, "auctions/bid.html", context)
