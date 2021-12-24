@@ -13,15 +13,11 @@ from .forms import ListingForm, CommentForm, BidForm
 def index(request):
     listings = Listing.objects.order_by('date_added')
     active_listings = []
-    bids = listing.bid_set.all()
-    for bid in bids:
-        if bid.bid > highest:
-            highest = bid.bid
     for listing in listings:
         if listing.active == True:
             active_listings.append(listing)
     context = {'listings': active_listings}
-    return render(request, "auctions/index2.html", context)
+    return render(request, "auctions/index.html", context)
 
 
 def login_view(request):
@@ -203,6 +199,8 @@ def bid(request, listing_id):
                     return render(request, "auctions/bid.html", context)
             else:
                 new_bid.save()
+                listing.highest = new_bid.bid
+                listing.save()
                 return HttpResponseRedirect(reverse("listing", args=(listing.id,)))
 
 

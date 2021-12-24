@@ -28,6 +28,7 @@ class Listing(models.Model):
     date_added = models.DateTimeField(auto_now_add=True)
     watchers = models.ManyToManyField(User, blank=True, related_name="watch_listings")
     active = models.BooleanField(default=True)
+    highest = models.IntegerField(default=1)
 
     def __str__(self):
         return self.title
@@ -42,7 +43,7 @@ class Comment(models.Model):
         verbose_name_plural = "Comments"
 
     def __str__(self):
-        return f"{self.owner}:{self.text[:20]}..."
+        return f"{self.owner}: {self.text}..."
 
 class Bid(models.Model):
     listing = models.ForeignKey(Listing, on_delete=models.CASCADE)
