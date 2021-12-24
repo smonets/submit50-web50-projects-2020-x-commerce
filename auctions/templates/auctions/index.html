@@ -22,18 +22,18 @@ margin-right:10px">
                        margin-bottom:10px">
             <a href="{% url 'listing' listing.id %}"><h3><strong>{{listing.title}}</strong></h3></a>
             <br>
-            Description: {{listing.description}}
+                <b>Description</b>: {{listing.description}}
             <p></p>
-            Category: {{listing.category}}
+                <b>Category</b>: {{listing.category}}
             <p></p>
-            Current price:
+                <b>Current price</b>:
                 {% if listing.starting_bid > listing.highest %}
                 {{listing.starting_bid}}$
                 {% else %}
                 {{listing.highest}}$
                 {% endif %}
             <p></p>
-            Date added: {{listing.date_added}}
+            <b>Date added</b>: {{listing.date_added}}
             </div>
         </div>
     {% endfor %}
