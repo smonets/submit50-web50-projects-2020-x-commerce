@@ -11,7 +11,7 @@ from .forms import ListingForm, CommentForm, BidForm
 
 
 def index(request):
-    listings = Listing.objects.order_by('date_added')
+    listings = Listing.objects.order_by('-date_added')
     active_listings = []
     for listing in listings:
         if listing.active == True:
@@ -192,12 +192,16 @@ def bid(request, listing_id):
             new_bid.listing = listing
             new_bid.owner = user
             bids = listing.bid_set.all()
-            for bid in bids:
-                if new_bid.bid < bid.bid or new_bid.bid < listing.starting_bid:
-                    error = "Your bid is too small"
-                    context = {'form': form, 'listing': listing, 'error': error}
-                    return render(request, "auctions/bid.html", context)
+            if new_bid.bid < listing.starting_bid:
+                error = "Your bid is too small"
+                context = {'form': form, 'listing': listing, 'error': error}
+                return render(request, "auctions/bid.html", context)
             else:
+                for bid in bids:
+                    if new_bid.bid < bid.bid:
+                        error = "Your bid is too small"
+                        context = {'form': form, 'listing': listing, 'error': error}
+                        return render(request, "auctions/bid.html", context)
                 new_bid.save()
                 listing.highest = new_bid.bid
                 listing.save()
