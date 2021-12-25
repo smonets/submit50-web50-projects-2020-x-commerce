@@ -1,0 +1,12 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+
+<h1>Place your bid: </h1>
+<span style="color:red">{{ error }}</span>
+<form method="POST" action="{% url 'bid' listing.id %}">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button class="btn btn-primary" name="submit">Add a new bid</button>
+
+{% endblock %}

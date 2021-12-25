@@ -1,0 +1,23 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+    <h1>{{ user.username }}, you are watching:</h1>
+    <p></p>
+    <ul>
+        {% for watching in watchings %}
+            <li>
+                <p><a href="{% url 'listing' watching.id %}">{{ watching }}</a></p>
+                <form method="POST">
+                    {% csrf_token %}
+                    <button class="btn btn-primary" name="submit" value="{{ watching.id }}">Remove</button>
+                </form>
+            </li>
+        {% empty %}
+            <li>There is no items yet</li>
+        {% endfor %}
+    </ul>
+
+
+
+
+{% endblock %}
